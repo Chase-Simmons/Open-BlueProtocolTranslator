@@ -49,6 +49,8 @@
     <Compile Include="Core\C.cs" />
     <Compile Include="Core\Host.cs" />
     <Compile Include="Core\Proxy.cs" />
+    <Compile Include="Core\RequestMapper.cs" />
+    <Compile Include="Core\UTF8Parser.cs" />
     <Compile Include="Core\X509.cs" />
     <Resource Include="Resources\bpmasterdata.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -56,13 +58,22 @@
     <Resource Include="Resources\loc.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Compile Include="Models\Request.cs" />
+    <Compile Include="Models\Response.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="app.manifest" />
+    <Resource Include="Resources\DStars_client_patch_en-en_1_P.sig">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\dinput8.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -16,16 +16,25 @@ namespace BPT
     {
         private static Proxy Proxy = new Proxy();
 
+        private static bool _active = true;
+
         public static int Main(string[] args)
         {
-            //C.EnableDebug();
+            C.EnableDebug();
 
             Proxy.Run();
 
-            while (true)
+            while (_active)
             {
-                Console.ReadKey();
+
             }
+
+            return 0;
+        }
+
+        public static void Shutdown()
+        {
+            _active = false;
         }
     }
 }

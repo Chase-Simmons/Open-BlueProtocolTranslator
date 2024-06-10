@@ -10,8 +10,14 @@ namespace BPT.Core
     public static class C
     {
         private static bool _active = false;
+        private static bool _isProcessing = false;
 
-        private static Action[] _e2Actions { get; set; } 
+        private static Action[] _e2Actions { get; set; }
+
+        public static bool IsProcessing()
+        {
+            return _isProcessing;
+        }
 
         public static void SetupHandler(X509 X509, Host Host)
         {
@@ -23,11 +29,13 @@ namespace BPT.Core
 
         public static void Section(string title, bool bypassDebug = false)
         {
+            _isProcessing = true;
             SectionBuilder(title, bypassDebug: bypassDebug);
         }
 
         public static void EndSection(bool bypassDebug = false)
         {
+            _isProcessing = false;
             SectionBuilder(lineBefore: true, bypassDebug: bypassDebug);
         }
 
@@ -93,7 +101,7 @@ namespace BPT.Core
 
             if (lineBefore)
             {
-                if (!bypassDebug)
+                if (!_active && !bypassDebug)
                 {
                     Out();
                 }
@@ -103,7 +111,7 @@ namespace BPT.Core
                 }
             }
 
-            if (!bypassDebug)
+            if (!_active && !bypassDebug)
             {
                 Out();
             }
@@ -144,6 +152,11 @@ namespace BPT.Core
         public static void EnableDebug()
         {
             _active = true;
+        }
+
+        public static bool IsDebugActive()
+        {
+            return _active;
         }
     }
 }
