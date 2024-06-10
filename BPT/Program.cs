@@ -29,6 +29,8 @@ namespace BPT
 
             }
 
+            Task.Run(() => Logger.DumpTraffic()).Wait();
+
             return 0;
         }
 

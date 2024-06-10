@@ -48,8 +48,10 @@
   <ItemGroup>
     <Compile Include="Core\C.cs" />
     <Compile Include="Core\Host.cs" />
+    <Compile Include="Core\Logger.cs" />
     <Compile Include="Core\Proxy.cs" />
     <Compile Include="Core\RequestMapper.cs" />
+    <Compile Include="Core\Traffic.cs" />
     <Compile Include="Core\UTF8Parser.cs" />
     <Compile Include="Core\X509.cs" />
     <Resource Include="Resources\bpmasterdata.pfx">

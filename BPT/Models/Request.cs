@@ -45,7 +45,7 @@ namespace BPT.Models
             this.Parse(UTF8);
         }
 
-        public async void Log()
+        public void Log(string key = null)
         {
             if (
                 string.IsNullOrEmpty(Type) &&
@@ -65,7 +65,7 @@ namespace BPT.Models
                 return;
             }
 
-            C.Section("Request");
+            C.Section(string.IsNullOrEmpty(key) ? "Request" : $"Request [ {key} ]");
 
             C.Debug($"[ Type ] : {Type}");
             C.Debug($"[ Host ] : {Host}");

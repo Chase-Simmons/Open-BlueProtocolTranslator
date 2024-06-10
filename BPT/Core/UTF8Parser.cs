@@ -61,11 +61,11 @@ namespace BPT.Core
             response.AcceptRanges = split[9].Replace("Accept-Ranges: ", "");
             response.LastModified = split[10].Replace("Last-Modified: ", "");
             response.ContentEncoding = split[11].Replace("Content-Encoding: ", "");
-            response.ContentLength = split[11].Replace("Content-Length: ", "");
-            response.Connection = split[11].Replace("Connection: ", "");
-            response.Date = split[11].Replace("Date: ", "");
-            response.EoLogUuid = split[11].Replace("EO-LOG-UUID: ", "");
-            response.EoCacheStatus = split[11].Replace("EO-Cache-Status: ", "");
+            response.ContentLength = split[12].Replace("Content-Length: ", "");
+            response.Connection = split[13].Replace("Connection: ", "");
+            response.Date = split[14].Replace("Date: ", "");
+            response.EoLogUuid = split[15].Replace("EO-LOG-UUID: ", "");
+            response.EoCacheStatus = split[16].Replace("EO-Cache-Status: ", "");
 
             return response;
         }

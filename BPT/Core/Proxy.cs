@@ -34,80 +34,78 @@ namespace BPT.Core
             {
                 while (_active)
                 {
-                    TcpClient client = listener.AcceptTcpClient();
-
-                    new Task(() =>
+                    try
                     {
-                        SslStream Client = new SslStream(client.GetStream(), false);
-                        Client.AuthenticateAsServer(X509.Get(), false, false);
+                        TcpClient client = listener.AcceptTcpClient();
 
-                        SslStream AWS = new SslStream(new TcpClient(Host.GetIp(), 443).GetStream(), false);
-                        AWS.AuthenticateAsClient("masterdata-main.aws.blue-protocol.com");
-
-                        HandleClientTraffic(Client, AWS);
-                        HandleAWSTraffic(AWS, Client);
-
-                    }).Start();
-                }
-
-            }).Start();
-        }
-
-        private void HandleClientTraffic(SslStream outbound, SslStream target)
-        {
-            new Task(() =>
-            {
-                byte[] numArray = new byte[4096];
-
-                while (_active)
-                {
-                    int count = ValidateCount(outbound, numArray) ?? 0;
-
-                    if (count != 0)
-                    {
-                        HandleDebugging(numArray, true);
-
-                        if (RequestMapper.HasMapping(numArray, out (string key, string file) mapping))
+                        new Task(() =>
                         {
-                            HandleInterceptedRequest(mapping, outbound);
-                            
-                            continue;
-                        }
+                            SslStream Client = new SslStream(client.GetStream(), false);
+                            Client.AuthenticateAsServer(X509.Get(), false, false);
 
-                        target.Write(numArray, 0, count);
+                            SslStream AWS = new SslStream(new TcpClient(Host.GetIp(), 443).GetStream(), false);
+                            AWS.AuthenticateAsClient("masterdata-main.aws.blue-protocol.com");
+
+                            Guid trafficID = Guid.NewGuid();
+
+                            Task.Run(() => HandleClientTraffic(Client, AWS, trafficID));
+                            Task.Run(() => HandleAWSTraffic(AWS, Client, trafficID));
+
+                        }).Start();
                     }
-                    else
-                    {
-                        break;
-                    }
+                    catch (Exception ex) { }
                 }
 
             }).Start();
         }
 
-        private void HandleAWSTraffic(SslStream outbound, SslStream target)
+        private void HandleClientTraffic(SslStream outbound, SslStream target, Guid guid)
         {
-            new Task(() =>
+            byte[] numArray = new byte[4096];
+
+            while (_active)
             {
-                byte[] numArray = new byte[4096];
+                int count = ValidateCount(outbound, numArray) ?? 0;
 
-                while (_active)
+                if (count != 0)
                 {
-                    int count = ValidateCount(outbound, numArray) ?? 0;
+                    HandleDebugging(numArray, true, guid);
 
-                    if (count != 0)
+                    if (RequestMapper.HasMapping(numArray, out (string key, string file) mapping))
                     {
-                        HandleDebugging(numArray, false);
+                        HandleInterceptedRequest(mapping, outbound);
 
-                        target.Write(numArray, 0, count);
+                        continue;
                     }
-                    else
-                    {
-                        break;
-                    }
+
+                    target.Write(numArray, 0, count);
                 }
+                else
+                {
+                    break;
+                }
+            }
+        }
 
-            }).Start();
+        private void HandleAWSTraffic(SslStream outbound, SslStream target, Guid guid)
+        {
+            byte[] numArray = new byte[4096];
+
+            while (_active)
+            {
+                int count = ValidateCount(outbound, numArray) ?? 0;
+
+                if (count != 0)
+                {
+                    HandleDebugging(numArray, false, guid);
+
+                    target.Write(numArray, 0, count);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         public void HandleInterceptedRequest((string key, string file) mapping, SslStream target)
@@ -133,30 +131,11 @@ namespace BPT.Core
             Program.Shutdown();
         }
 
-        private List<string> _contents = new List<string>();
-        private void HandleDebugging(byte[] bytes, bool outbound)
+        private void HandleDebugging(byte[] bytes, bool outbound, Guid guid)
         {
             if (C.IsDebugActive())
             {
-                string strout = Encoding.UTF8.GetString(bytes);
-
-                if (!outbound)
-                {
-                    if (strout.StartsWith(@"�"))
-                    {
-                        _contents.Add(strout);
-                        C.Debug("\nContent has been logged\n");
-                    }
-                }
-
-                if (outbound)
-                {
-                    Task.Run(new Request(strout).Log).Wait();
-                }
-                else
-                {
-                    Task.Run(new Response(strout).Log).Wait();
-                }
+                Traffic.Record(guid, bytes);
             }
         }
 

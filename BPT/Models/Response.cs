@@ -33,7 +33,7 @@ namespace BPT.Models
             this.Parse(UTF8);
         }
 
-        public async void Log()
+        public void Log()
         {
             if (
                string.IsNullOrEmpty(Type) &&
